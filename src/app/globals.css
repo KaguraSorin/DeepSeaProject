@@ -1,0 +1,199 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   深海学习航线 · 设计令牌
+   主色三色：midnight / indigo / aurora
+   点缀仅 2 个：cyan（航线流光/焦点）、mint（完成/成功）
+   ============================================================ */
+:root {
+  --font-sans: 'Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui,
+    -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --midnight: #191b41;
+  --indigo: #3c3b80;
+  --aurora: #9373bc;
+  --cyan: #5ee7ff;
+  --mint: #7bffcb;
+
+  --text-1: #f7f4ff;
+  --text-2: #c9c4e6;
+
+  --glass: rgba(247, 244, 255, 0.06);
+  --glass-brd: rgba(247, 244, 255, 0.14);
+  --glass-hi: rgba(247, 244, 255, 0.1);
+
+  /* 备用（默认不用） */
+  --coral: #ff8fa3;
+  --lemon: #ffe066;
+
+  --radius-lg: 1.5rem;
+  --focus-ring: 0 0 0 2px rgba(147, 115, 188, 0.9), 0 0 0 4px rgba(25, 27, 65, 0.9);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--midnight);
+    color: var(--text-1);
+    min-height: 100dvh;
+    overflow-x: hidden;
+    font-feature-settings: 'palt' on;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* 键盘焦点环：aurora 主色，保证可访问性 */
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: 0.5rem;
+  }
+
+  ::selection {
+    background: rgba(147, 115, 188, 0.45);
+    color: var(--text-1);
+  }
+
+  /* 滚动条 */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(147, 115, 188, 0.55) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(147, 115, 188, 0.6), rgba(60, 59, 128, 0.6));
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(147, 115, 188, 0.85), rgba(60, 59, 128, 0.85));
+    background-clip: padding-box;
+  }
+}
+
+@layer components {
+  /* 玻璃卡片 */
+  .glass {
+    background: var(--glass);
+    border: 1px solid var(--glass-brd);
+    backdrop-filter: blur(18px) saturate(120%);
+    -webkit-backdrop-filter: blur(18px) saturate(120%);
+  }
+  .glass-strong {
+    background: linear-gradient(160deg, rgba(247, 244, 255, 0.1), rgba(247, 244, 255, 0.04));
+    border: 1px solid var(--glass-brd);
+    backdrop-filter: blur(24px) saturate(130%);
+    -webkit-backdrop-filter: blur(24px) saturate(130%);
+  }
+
+  /* 渐变文字标题 */
+  .text-gradient {
+    background: linear-gradient(100deg, #f7f4ff 0%, #c9c4e6 40%, #9373bc 75%, #5ee7ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* 渐变描边按钮 */
+  .btn-gradient {
+    background: linear-gradient(120deg, #3c3b80, #9373bc 60%, #5ee7ff 140%);
+    background-size: 200% 100%;
+    transition: background-position 0.6s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  }
+  .btn-gradient:hover {
+    background-position: 100% 50%;
+    box-shadow: 0 10px 30px rgba(147, 115, 188, 0.35);
+  }
+
+  /* 横向 snap 滑动（移动端） */
+  .snap-row {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .snap-row::-webkit-scrollbar {
+    display: none;
+  }
+  .snap-item {
+    scroll-snap-align: center;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .gpu {
+    transform: translateZ(0);
+    will-change: transform, opacity;
+  }
+}
+
+/* ============================================================
+   减少动态偏好：关闭所有装饰性动画
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* data-motion="off" 时同样关闭（由 useLowPerf 挂到 html 上） */
+html[data-motion='off'] *,
+html[data-motion='off'] *::before,
+html[data-motion='off'] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+/* ============================================================
+   打印样式：导出计划时隐藏装饰，还原可读排版
+   ============================================================ */
+@media print {
+  :root {
+    --midnight: #ffffff;
+    --text-1: #111111;
+    --text-2: #333333;
+  }
+  body {
+    background: #ffffff !important;
+    color: #111111 !important;
+  }
+  .no-print,
+  .ocean-bg,
+  [data-print='hide'] {
+    display: none !important;
+  }
+  .glass,
+  .glass-strong {
+    background: #ffffff !important;
+    border: 1px solid #cccccc !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
+  .print-block {
+    display: block !important;
+  }
+}
