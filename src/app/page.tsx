@@ -183,6 +183,25 @@ export default function Page() {
     async (nextInput: Partial<PlanInput>, history: ChatMessage[], key: string) => {
       setThinking(true);
       setError(null);
+
+      // 静态部署（Cloudflare Pages 等）没有 /api/xii 服务端接口，
+      // 直接在浏览器本地用 Mock 生成，保证无服务器也能完整演示。
+      if (process.env.NEXT_PUBLIC_STATIC === '1') {
+        await new Promise((r) => setTimeout(r, 450)); // 保留一点“汐在思考”的体感
+        const fallback = mockGenerator(normalizeFromForm(nextInput));
+        upsertPlan(fallback);
+        const draft = usePlanStore.getState().chatByPlan[DRAFT_KEY] ?? [];
+        draft.forEach((m) => appendMessage(fallback.id, m));
+        clearChat(DRAFT_KEY);
+        appendMessage(
+          fallback.id,
+          makeMessage('xii', `已在本地为你铺好航线《${fallback.title}》。${fallback.summary}`, 'plan'),
+        );
+        setSelectedStageId(null);
+        setThinking(false);
+        return fallback;
+      }
+
       try {
         const res = await fetch('/api/xii', {
           method: 'POST',
