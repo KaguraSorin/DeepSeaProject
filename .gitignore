@@ -33,3 +33,6 @@ next-env.d.ts
 # uploaded read-only files (环境上传目录，不入库)
 .uploads/
 .reports/
+# cloudflare/wrangler
+.wrangler/
+.wrangler-dryrun/
