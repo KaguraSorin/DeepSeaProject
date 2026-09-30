@@ -55,13 +55,14 @@ src/
 ```bash
 npm install
 npm run dev        # http://localhost:3000
-# 或生产
-npm run build && npm run start
 ```
 
 ```bash
-npm run lint       # 代码规范
-npm test           # Mock 生成器单测（唯一核心单测）
+npm run build        # 静态导出 → out/（用于 Cloudflare / 纯静态托管）
+npm run build:server # 服务端构建 → .next（用于 Vercel / 自托管，含 /api/xii）
+npm run start:server # 服务端构建并启动
+npm run lint         # 代码规范
+npm test             # Mock 生成器单测（唯一核心单测）
 ```
 
 首次访问会自动生成一条示例航线（雅思 7 分 · 每天 60 分钟 · 60 天）供直接体验。
@@ -97,18 +98,40 @@ AI_MODEL=qwen-plus
 
 ## 部署
 
-### Vercel
+### Cloudflare（推荐 · 国内访问友好 · 纯静态）
 
-1. 把仓库推送到 GitHub / GitLab。
-2. 在 Vercel 导入项目，框架自动识别 Next.js。
-3. 如需 AI，在 Vercel 环境变量中配置 `AI_*`。构建命令 `npm run build`。
+仓库已内置 `wrangler.jsonc`（声明为静态资源部署），Cloudflare 不会去套用 Next.js 适配器。
 
-### Netlify
+**方式一：Workers & Pages → 连接 Git**
+| 配置项 | 值 |
+|---|---|
+| 根目录 Root directory | `/` |
+| 构建命令 Build command | `npm run build` |
+| 部署命令 Deploy command | `npx wrangler deploy` |
 
-1. 导入仓库，构建命令 `npm run build`，输出目录 `.next`。
-2. 可选配置环境变量 `AI_*`。
+产物由 `wrangler.jsonc` 的 `assets.directory = ./out` 指定，无需填输出目录。纯静态部署下默认走浏览器本地生成器（无 `/api/xii`），功能完整可用。
+
+**方式二：本地命令部署**
+```bash
+npm run build && npx wrangler deploy
+```
+
+### Vercel / Netlify（服务端，保留 `/api/xii` 真实 AI）
+
+1. 在 Vercel / Netlify 导入仓库。
+2. 将 **构建命令改为 `npm run build:server`**（默认的 `npm run build` 是静态导出，不含 API 路由）。
+3. 如需 AI，配置环境变量 `AI_*`（见上）。
 
 > 数据全部存储在用户浏览器 localStorage，无需数据库。
+
+---
+
+## 部署模式对照
+
+| 模式 | 构建命令 | 产物 | `/api/xii` | 计划生成 |
+|---|---|---|---|---|
+| 纯静态（Cloudflare） | `npm run build` | `out/` | 无 | 浏览器本地 Mock |
+| 服务端（Vercel / 自托管） | `npm run build:server` | `.next` | 有 | AI 或 Mock 兜底 |
 
 ---
 
